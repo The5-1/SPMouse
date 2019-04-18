@@ -189,7 +189,7 @@ namespace PreciseMouse
         static Graphics g;
 
         static Pen pen = Pens.Red;
-        static Brush brush = Brushes.Red;
+        static Brush brush = Brushes.White;
         static Pen penB = Pens.DarkRed;
         //static SolidBrush brushA = new SolidBrush(Color.DarkGray);
         //static SolidBrush brushB = new SolidBrush(Color.DarkRed);
@@ -292,12 +292,16 @@ namespace PreciseMouse
 
             draggerPos += mouseDelta;
 
-            previousMousePos = currentMousePos;
             return changed;
         }
 
         public static void applyCursorManipulation()
         {
+            Interop.getCursorPos(ref currentMousePos);
+            mouseDelta = currentMousePos - previousMousePos;
+
+            draggerPos += mouseDelta;
+
             towDelta = draggerPos - cursorPos;
             towDist = towDelta.Length();
             if (towDist > 0.0)
@@ -314,6 +318,7 @@ namespace PreciseMouse
             cursorPos += Vector2.Multiply(towTension, towDir);
 
             Interop.setCursorPos(cursorPos);
+            Interop.getCursorPos(ref previousMousePos);
         }
 
         public static void draw()
