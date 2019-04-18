@@ -40,14 +40,29 @@ namespace PreciseMouse
         ** Need to replace CoreDll with User32 though
         */
         [DllImport("User32.dll")]
-        public static extern bool GetCursorPos(ref Point lpPoint);
+        static extern bool GetCursorPos(ref Point lpPoint);
 
         [DllImport("User32.dll")]
-        public static extern bool SetCursorPos(int X, int Y);
+        static extern bool ClientToScreen(IntPtr hwnd, ref Point lpPoint);
 
-        public static bool setCursorPos(Point p)
+        [DllImport("User32.dll")]
+        static extern bool SetCursorPos(int X, int Y);
+
+        public static bool getCursorPos(ref Vector2 vec)
         {
-            return SetCursorPos(p.X, p.Y);
+            Point p = new Point();
+            bool suc = GetCursorPos(ref p);
+            if (suc)
+            {
+                vec.X = (float)p.X;
+                vec.Y = (float)p.Y;
+            }
+            return suc;
+        }
+
+        public static bool setCursorPos(Vector2 vec)
+        {
+            return SetCursorPos((int)vec.X, (int)vec.Y);
         }
 
 
@@ -133,7 +148,6 @@ namespace PreciseMouse
 
     }
 
-
     static class MathUtil
     {
         public static void toVec(Point p, ref Vector2 vec)
@@ -151,34 +165,108 @@ namespace PreciseMouse
         public static void add(ref Point p, Vector2 vec)
         {
             p.X = p.X + (int)vec.X;
-            p.Y = p.Y +(int)vec.Y;
+            p.Y = p.Y + (int)vec.Y;
         }
 
+
+        public static Point toPoint(Vector2 vec)
+        {
+            return new Point((int)vec.X, (int)vec.Y);
+        }
     }
 
-    static class SPMouse
+    struct Rope
     {
-        static double maxdist = 32.0f;
+        public Vector2 start;
+        public Vector2 end;
+        public float length;
+    }
 
+
+    static class Drawer
+    {
         static IntPtr desktopPtr;
         static Graphics g;
 
-        static Pen penA = Pens.DarkGray;
+        static Pen pen = Pens.Red;
+        static Brush brush = Brushes.Red;
         static Pen penB = Pens.DarkRed;
         //static SolidBrush brushA = new SolidBrush(Color.DarkGray);
         //static SolidBrush brushB = new SolidBrush(Color.DarkRed);
         //static Pen penA = new Pen(brushA);
         //static Pen penB = new Pen(brushB);
 
-        public static Point previousMousePos_ = new Point();
-        public static Point currentMousePos_ = new Point();
-        public static Point overriddenPos_ = new Point();
-        public static Point draggerPos_ = new Point();
-        public static Vector2 delta = new Vector2();
-        public static Vector2 dir = new Vector2();
-        public static float draggerDist;
-        public static float tension;
-        public static Vector2 move = new Vector2();
+        public static void init()
+        {
+            desktopPtr = Interop.GetDC(IntPtr.Zero);
+            g = Graphics.FromHdc(desktopPtr);
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        }
+
+        public static void drawLine(Vector2 start, Vector2 end)
+        {
+            g.DrawLine(pen, MathUtil.toPoint(start), MathUtil.toPoint(end));
+        }
+
+        public static void drawCircle(Vector2 pos, float radius)
+        {
+            g.DrawEllipse(pen, pos.X - radius/2.0f, pos.Y - radius/2.0f, radius, radius);
+        }
+
+        public static void drawDot(Vector2 pos, float radius)
+        {
+            g.FillEllipse(brush, pos.X - radius / 2.0f, pos.Y - radius / 2.0f, radius, radius);
+        }
+
+        public static void drawRope(Vector2 start, Vector2 end, float length)
+        {
+            /* Bezier length approximation https://stackoverflow.com/questions/29438398/cheap-way-of-calculating-cubic-bezier-length
+            ** Bezier bezier = Bezier (p0, p1, p2, p3);
+            ** chord = (p3-p0).Length;
+            ** cont_net = (p0 - p1).Length + (p2 - p1).Length + (p3 - p2).Length;
+            ** app_arc_length = (cont_net + chord) / 2
+            ** --> rope   = spanning quad / 2
+            ** --> rope*2 = spanning quad
+            **
+            ** Inverse problem: find controll points for given length:
+            ** our spanning quad is a rectangle, we know the width = dist, we seek the height:
+            ** --> spanning rectangle = (2*width + 2*height)
+            ** --> rope*2 = spanning rectangle
+            ** --> rope*2 = (2*dist + 2*height)
+            ** --> (rope*2 - dist*2) /2 = height
+            ** --> rope - dist = height
+            */
+
+            float diff = Vector2.Distance(start, end);
+            float hangtrough = (float)Math.Max(0.0,length - diff)*0.666f; //empiric factor that makes it work
+            g.DrawBezier(pen, start.X, start.Y, start.X, start.Y + hangtrough, end.X, end.Y + hangtrough, end.X, end.Y);
+        }
+
+        public static void draw()
+        {
+
+        }
+
+        public static void redrawBounds(Vector2 TL, Vector2 BR)
+        {
+           
+        }
+    }
+
+    static class SPMouse
+    {
+        static float maxdist = 128.0f;
+
+        public static Vector2 previousMousePos = new Vector2();
+        public static Vector2 currentMousePos = new Vector2();
+        public static Vector2 mouseDelta = new Vector2();
+
+        public static Vector2 cursorPos = new Vector2();
+        public static Vector2 draggerPos = new Vector2();
+        public static Vector2 towDelta = new Vector2();
+        public static Vector2 towDir = new Vector2();
+        public static float towDist;
+        public static float towTension;
 
 
         static SPMouse()
@@ -188,60 +276,61 @@ namespace PreciseMouse
 
         public static void init()
         {
-            desktopPtr = Interop.GetDC(IntPtr.Zero);
-            g = Graphics.FromHdc(desktopPtr);
+            Drawer.init();
 
-            Interop.GetCursorPos(ref previousMousePos_);
-            Interop.GetCursorPos(ref currentMousePos_);
-            Interop.GetCursorPos(ref overriddenPos_);
-            Interop.GetCursorPos(ref draggerPos_);
+            Interop.getCursorPos(ref previousMousePos);
+            Interop.getCursorPos(ref currentMousePos);
+            Interop.getCursorPos(ref cursorPos);
+            Interop.getCursorPos(ref draggerPos);
         }
 
-        public static bool getPos()
-        {
-            Interop.GetCursorPos(ref currentMousePos_);
+        public static bool updatePositions()
+        {       
+            Interop.getCursorPos(ref currentMousePos);
+            bool changed = (previousMousePos != currentMousePos);
+            mouseDelta = currentMousePos - previousMousePos;
 
-            if (previousMousePos_ != currentMousePos_)
+            draggerPos += mouseDelta;
+
+            previousMousePos = currentMousePos;
+            return changed;
+        }
+
+        public static void applyCursorManipulation()
+        {
+            towDelta = draggerPos - cursorPos;
+            towDist = towDelta.Length();
+            if (towDist > 0.0)
             {
-                previousMousePos_ = currentMousePos_;
-                draggerPos_ = currentMousePos_;
-                return true;
+                towDir = Vector2.Normalize(towDelta);
             }
             else
             {
-                return false;
+
+                towDir = Vector2.Zero;
             }
-        }
+            towTension = (float)(Math.Max(0.0,towDist - maxdist));
 
-        public static void updateCursor()
-        {
-            delta.X = (float)(draggerPos_.X - overriddenPos_.X);
-            delta.Y = (float)(draggerPos_.Y - overriddenPos_.Y);
-            draggerDist = delta.Length();
-            dir = Vector2.Normalize(delta);
-            tension = (float)(Math.Max(0.0,draggerDist - maxdist));
+            cursorPos += Vector2.Multiply(towTension, towDir);
 
-            move = Vector2.Multiply(tension, dir);
-            MathUtil.add(ref overriddenPos_, move);
-            Interop.setCursorPos(overriddenPos_);
-        }
-
-        public static void endFrame()
-        {
-            previousMousePos_ = currentMousePos_;
+            Interop.setCursorPos(cursorPos);
         }
 
         public static void draw()
         {
-            g.DrawLine(penB, overriddenPos_, draggerPos_);
+            //Drawer.drawLine(cursorPos, draggerPos);
+            Drawer.drawRope(cursorPos, draggerPos, maxdist);
+            Drawer.drawCircle(cursorPos, 9.0f);
+            Drawer.drawCircle(draggerPos, 12.0f);
+            Drawer.drawDot(draggerPos, 6.0f);
         }
 
         public static void debug()
         {
-            Console.WriteLine("Mouse: {0},{1}", overriddenPos_.X, overriddenPos_.Y);
-            Console.WriteLine("Dragr: {0},{1}", draggerPos_.X, draggerPos_.Y);
-            Console.WriteLine("dist: {0}", draggerDist);
-            Console.WriteLine("tension: {0}", tension);
+            Console.WriteLine("Mouse: {0},{1}", cursorPos.X, cursorPos.Y);
+            Console.WriteLine("Dragr: {0},{1}", draggerPos.X, draggerPos.Y);
+            Console.WriteLine("dist: {0}", towDist);
+            Console.WriteLine("tension: {0}", towTension);
         }
 
     }
@@ -256,14 +345,13 @@ namespace PreciseMouse
 
             while (true)
             {
-                if (SPMouse.getPos())
+                if (SPMouse.updatePositions())
                 {
                     //SceenUtil.test();
-                    SPMouse.updateCursor();
-                    SPMouse.debug();
+                    SPMouse.applyCursorManipulation();
+                    //SPMouse.debug();
                 }
                 SPMouse.draw();
-                SPMouse.endFrame();
             }
         }
     }
