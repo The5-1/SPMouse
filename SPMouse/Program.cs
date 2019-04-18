@@ -175,18 +175,12 @@ namespace PreciseMouse
         }
     }
 
-    struct Rope
-    {
-        public Vector2 start;
-        public Vector2 end;
-        public float length;
-    }
-
 
     static class Drawer
     {
         static IntPtr desktopPtr;
-        static Graphics g;
+        public static Graphics g;
+        public static System.Drawing.Drawing2D.GraphicsContainer ctnr;
 
         static Pen pen = Pens.Red;
         static Brush brush = Brushes.White;
@@ -201,6 +195,21 @@ namespace PreciseMouse
             desktopPtr = Interop.GetDC(IntPtr.Zero);
             g = Graphics.FromHdc(desktopPtr);
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        }
+
+        public static void start()
+        {
+            //desktopPtr = Interop.GetDC(IntPtr.Zero);
+            //g = Graphics.FromHdc(desktopPtr);
+            //ctnr = g.BeginContainer();
+            //g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            //g.Clear(Color.Transparent);
+        }
+
+        public static void end()
+        {
+            //g.EndContainer(ctnr);
+            //g.Dispose();
         }
 
         public static void drawLine(Vector2 start, Vector2 end)
@@ -249,7 +258,13 @@ namespace PreciseMouse
 
         public static void redrawBounds(Vector2 TL, Vector2 BR)
         {
-           
+            //g.FillRectangle(Brushes.Transparent, TL.X, TL.Y, BR.X - TL.X, BR.Y - TL.Y);
+        }
+
+        public static void redrawBounds(float X, float Y, float width, float height)
+        {
+            //g.FillRectangle(Brushes.Transparent, X, Y, width, height);
+            g.Flush();
         }
     }
 
@@ -323,11 +338,16 @@ namespace PreciseMouse
 
         public static void draw()
         {
+            Drawer.start();
+            //Drawer.redrawBounds(0, 0, 1000, 1000);
             //Drawer.drawLine(cursorPos, draggerPos);
             Drawer.drawRope(cursorPos, draggerPos, maxdist);
             Drawer.drawCircle(cursorPos, 9.0f);
             Drawer.drawCircle(draggerPos, 12.0f);
             Drawer.drawDot(draggerPos, 6.0f);
+            Drawer.redrawBounds(0, 0, 1000, 1000);
+            Drawer.end();
+
         }
 
         public static void debug()
