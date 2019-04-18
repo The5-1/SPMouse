@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{37C3152D-537C-4D30-83AC-81670539B9A1}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>PreciseMouse</RootNamespace>
-    <AssemblyName>PreciseMouse</AssemblyName>
+    <RootNamespace>SPMouse</RootNamespace>
+    <AssemblyName>SPMouse</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

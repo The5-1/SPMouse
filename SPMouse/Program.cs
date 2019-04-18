@@ -28,7 +28,8 @@ namespace PreciseMouse
 
     static class SceenUtil{
 
-        static Point lastPos = new Point();
+        static Point lastPos_ = new Point();
+        static Point newPos_ = new Point();
 
         [DllImport("User32.dll")]
         public static extern IntPtr GetDC(IntPtr hwnd);
@@ -56,33 +57,39 @@ namespace PreciseMouse
             IntPtr desktopPtr = GetDC(IntPtr.Zero);
             Graphics g = Graphics.FromHdc(desktopPtr);
 
-            SolidBrush b = new SolidBrush(Color.DarkRed);
-            g.FillRectangle(b, new Rectangle(0, 0, 128, 128));
+
+            SolidBrush sb = new SolidBrush(Color.DarkRed);
+            Pen p = new Pen(sb);
+            g.FillRectangle(sb, new Rectangle(0, 0, 128, 128));
+
+            g.DrawLine(p, lastPos_, newPos_);
 
             g.Dispose();
             ReleaseDC(IntPtr.Zero, desktopPtr);
         }
 
+
         public static bool updatePos()
         {
-            Point newPos = new Point();
-            GetCursorPos(ref newPos);
+            GetCursorPos(ref newPos_);
 
-            if(newPos != lastPos)
-            {
-                lastPos = newPos;
+            if(newPos_ != lastPos_){
                 return true;
             }
-            else
-            {
+            else{
                 return false;
             }
+        }
+
+        public static void endFrame()
+        {
+            lastPos_ = newPos_;
         }
 
     }
 
 
-    class Program
+    class App
     {
         static void Main(string[] args)
         {
@@ -94,6 +101,7 @@ namespace PreciseMouse
                 {
                     SceenUtil.test();
                 }
+                SceenUtil.endFrame();
             }
         }
     }
