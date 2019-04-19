@@ -69,6 +69,7 @@
     <Compile Include="SPmouseOverlay.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Win32\formsExtensions.cs" />
     <Compile Include="Win32\nativemethods.cs" />
     <Compile Include="Win32\safenativemethods.cs" />
     <Compile Include="Win32\unsafenativemethods.cs" />
