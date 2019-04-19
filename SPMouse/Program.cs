@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using System.Windows.Forms;
+
+
 using System.Numerics;
 
 using System.Drawing;
@@ -14,7 +17,10 @@ using System.Drawing;
 */
 using System.Runtime.InteropServices;
 
-namespace PreciseMouse
+
+
+
+namespace SPMouse
 {
     //public class Highlighter
     //{
@@ -270,7 +276,7 @@ namespace PreciseMouse
 
     static class SPMouse
     {
-        static float maxdist = 128.0f;
+        static float maxdist = 32f;
 
         public static Vector2 previousMousePos = new Vector2();
         public static Vector2 currentMousePos = new Vector2();
@@ -360,24 +366,116 @@ namespace PreciseMouse
 
     }
 
+
+    static class FormsTest1
+    {
+        static int TLX_ = 100;
+        static int TLY_ = 100;
+        static int width_ = 200;
+        static int height_ = 100;
+
+        public static void test01()
+        {
+
+
+            //initialize the form
+            var _form = new Form();
+
+            Color _color = Color.Black;
+
+            _form.FormBorderStyle = FormBorderStyle.None;
+            _form.ShowInTaskbar = false;
+            _form.TopMost = true;
+            _form.Visible = false;
+            _form.Left = 0;
+            _form.Top = 0;
+            _form.Width = 1;
+            _form.Height = 1;
+            _form.Hide();
+            _form.Show();
+            _form.Opacity = 0.1;
+
+            //set popup style
+            int num1 = Win32Util.UnsafeNativeMethods.GetWindowLong(_form.Handle, -20);
+            Win32Util.UnsafeNativeMethods.SetWindowLong(_form.Handle, -20, num1 | 0x80);
+            Win32Util.SafeNativeMethods.ShowWindow(_form.Handle, 8);
+            Win32Util.SafeNativeMethods.SetWindowPos(_form.Handle, Win32Util.NativeMethods.HWND_TOPMOST, TLX_, TLY_, width_, height_, 0x10);
+        }
+    }
+
+
+    static class FormsTest2
+    {
+        public static void test01()
+        {
+            Color transparencyKey = Color.FromArgb(255, 255, 0, 255);
+
+            Form f = new Form();
+            f.Text = "SPM - Surgical Precision Mousing";
+            f.WindowState = FormWindowState.Maximized;
+            f.ShowInTaskbar = false;
+            f.Visible = false;
+            f.TopMost = true;
+            f.FormBorderStyle = FormBorderStyle.None;
+            f.BackColor = transparencyKey;
+            //f.TransparencyKey = transparencyKey;
+            f.Opacity = 0.1;
+            f.AllowTransparency = true;
+            f.Show();
+            //f.Hide();
+
+
+            //modify extended-window-styles: https://docs.microsoft.com/en-us/windows/desktop/winmsg/extended-window-styles
+            //enable klick trough: https://stackoverflow.com/questions/2798245/click-through-in-c-sharp-form
+            //show without focusing: https://stackoverflow.com/questions/156046/show-a-form-without-stealing-focus/156159#156159
+            const int WS_EX_LAYERED = 0x80000;
+            const int WS_EX_TRANSPARENT = 0x20;
+            const int SWP_NOACTIVATE = 0x0010;
+            int flags = Win32Util.UnsafeNativeMethods.GetWindowLong(f.Handle, -20); //get the "extended Window Styles" bitmask
+            Win32Util.UnsafeNativeMethods.SetWindowLong(f.Handle, -20, flags | WS_EX_LAYERED | WS_EX_TRANSPARENT);
+
+            Win32Util.SafeNativeMethods.ShowWindow(f.Handle, SWP_NOACTIVATE); //FIXME, does not actually show the form?
+
+            //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.control.paint?view=netframework-4.8
+            //paint event is called when controll is redrawn, i need another event.
+            f.Paint += new System.Windows.Forms.PaintEventHandler(FormsTest2.paintCallback);
+            f.Update();
+        }
+
+        public static void paintCallback(object sender, System.Windows.Forms.PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            // Draw a line in the PictureBox.
+            g.DrawLine(System.Drawing.Pens.Red, 0,0, 1000, 1000);
+        }
+    }
+
+
     class App
     {
         static void Main(string[] args)
         {
-            SPMouse.init();
 
-            Console.WriteLine("Hello: {0}", "test");
+            //FormsTest1.test01();
 
-            while (true)
-            {
-                if (SPMouse.updatePositions())
-                {
-                    //SceenUtil.test();
-                    SPMouse.applyCursorManipulation();
-                    //SPMouse.debug();
-                }
-                SPMouse.draw();
-            }
+            FormsTest2.test01();
+
+            while (true) ;
+
+            //SPMouse.init();
+
+            //Console.WriteLine("Hello: {0}", "test");
+
+            //while (true)
+            //{
+            //    if (SPMouse.updatePositions())
+            //    {
+            //        //SceenUtil.test();
+            //        SPMouse.applyCursorManipulation();
+            //        //SPMouse.debug();
+            //    }
+            //    SPMouse.draw();
+            //}
         }
     }
 }
