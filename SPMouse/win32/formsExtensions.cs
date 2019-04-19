@@ -9,6 +9,8 @@ namespace FormsExtensions
 {
     public static class WindowExtension
     {
+
+        // https://www.codeproject.com/Answers/1174965/How-can-I-make-my-form-like-windows-blurr-effect-o#answer3
         public static void EnableBlur(this Form @this)
         {
             var accent = new UnsafeNativeMethods.AccentPolicy();
