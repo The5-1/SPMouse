@@ -8,10 +8,11 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>SPMouse</RootNamespace>
     <AssemblyName>SPMouse</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -72,6 +73,8 @@
     <Compile Include="Win32\formsExtensions.cs" />
     <Compile Include="Win32\nativemethods.cs" />
     <Compile Include="Win32\safenativemethods.cs" />
+    <Compile Include="Win32\systemcolors.cs" />
+    <Compile Include="Win32\transparency.cs" />
     <Compile Include="Win32\unsafenativemethods.cs" />
   </ItemGroup>
   <ItemGroup>

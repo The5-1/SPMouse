@@ -9,22 +9,18 @@ using System.Text;
 using System.Runtime.InteropServices;
 
 
-namespace Win32Util
+public static partial class Win32Util
 {
-    internal static class SafeNativeMethods
-    {
-        // Methods
-        [return: MarshalAs(UnmanagedType.Bool)]
-        [DllImport("gdi32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        internal static extern bool BitBlt(IntPtr hDC, int x, int y, int nWidth, int nHeight, IntPtr hSrcDC, int xSrc, int ySrc, int dwRop);
-        [return: MarshalAs(UnmanagedType.Bool)]
-        [DllImport("user32.dll", ExactSpelling = true)]
-        internal static extern bool SetProcessDPIAware();
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        internal static extern bool SetWindowPos(IntPtr hWnd, IntPtr hwndAfter, int x, int y, int width, int height, int flags);
-        [return: MarshalAs(UnmanagedType.Bool)]
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        internal static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-    }
-
+    // Methods
+    [return: MarshalAs(UnmanagedType.Bool)]
+    [DllImport("gdi32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern bool BitBlt(IntPtr hDC, int x, int y, int nWidth, int nHeight, IntPtr hSrcDC, int xSrc, int ySrc, int dwRop);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    [DllImport("user32.dll", ExactSpelling = true)]
+    public static extern bool SetProcessDPIAware();
+    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hwndAfter, int x, int y, int width, int height, int flags);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 }

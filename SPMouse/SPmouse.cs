@@ -9,31 +9,51 @@ namespace SPMouse
     public class SPMouse : System.Windows.Forms.Form
     {
         private Icon icon;
+        private Color accentColor;
+        private Font font_header;
+        private Font font;
 
         private Label label1 = new Label();
-
 
         private NotifyIcon tray = new NotifyIcon();
         private ContextMenu tray_menu = new ContextMenu();
         private MenuItem tray_menu_exit = new MenuItem();
 
+
+        private SPMouseOverlay overlay;
+
+        static void Main()
+        {
+            Application.EnableVisualStyles(); //Enable Win10 Styling
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new SPMouse());
+        }
+
         public SPMouse()
         {
+            //Loads Resources from the Project Properties!
             icon = Properties.Resources.SPM_Icon;
+            accentColor = Win32Util.GetThemeColor();
+            font_header = SystemFonts.CaptionFont;
+            font = SystemFonts.DefaultFont;
 
             //Main Window
             this.Icon = icon; //load the icon from the project property Resources
             this.Name = "SPMouse";
             this.Text = "SPMouse";
+            this.font = font_header;
             this.ClientSize = new System.Drawing.Size(256, 256);
-            this.BackColor = Color.Magenta;
-            this.TransparencyKey = Color.Magenta;
+            this.BackColor = accentColor;
+            //this.BackColor = SystemColors.Highlight;
+            //this.TransparencyKey = this.BackColor;
 
-            this.AllowTransparency = true;
-            SetStyle(ControlStyles.UserPaint, true);
-            SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
-            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-            this.EnableBlur();
+            this.FormBorderStyle = FormBorderStyle.Sizable;
+
+            //this.AllowTransparency = true;
+            //this.SetStyle(ControlStyles.UserPaint, true);
+            //this.SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
+            //this.SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            //this.EnableBlur();
             
 
             //Main Window - Label
@@ -58,6 +78,11 @@ namespace SPMouse
             });
 
 
+            //Overlay
+            overlay = new SPMouseOverlay();
+            overlay.init(icon);
+            overlay.Show();
+
             //Add controls
             this.Controls.AddRange(new System.Windows.Forms.Control[] {
                 label1
@@ -68,23 +93,6 @@ namespace SPMouse
             this.tray.MouseDoubleClick += this.notifyIconClickedCallback;
         }
 
-        private void InitializeComponent()
-        {
-            this.SuspendLayout();
-            this.Load += new System.EventHandler(this.loadCallback);
-            this.ResumeLayout(false);
-        }
-
-        //Main Entry Point
-        static void Main()
-        {
-            Application.Run(new SPMouse());
-        }
-
-        private void loadCallback(object sender, EventArgs e)
-        {
-
-        }
 
         private void resizeCallback(object sender, EventArgs e)
         {
@@ -122,6 +130,19 @@ namespace SPMouse
             // new MyForm ().Show ();
         }
 
+        private void InitializeComponent()
+        {
+            this.SuspendLayout();
+            // 
+            // SPMouse
+            // 
+            this.Load += new System.EventHandler(this.SPMouse_Load);
+            this.ResumeLayout(false);
+        }
 
+        private void SPMouse_Load(object sender, EventArgs e)
+        {
+
+        }
     }
 }

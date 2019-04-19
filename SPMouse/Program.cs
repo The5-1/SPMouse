@@ -397,10 +397,10 @@ namespace SPMouse
             _form.Opacity = 0.1;
 
             //set popup style
-            int num1 = Win32Util.UnsafeNativeMethods.GetWindowLong(_form.Handle, -20);
-            Win32Util.UnsafeNativeMethods.SetWindowLong(_form.Handle, -20, num1 | 0x80);
-            Win32Util.SafeNativeMethods.ShowWindow(_form.Handle, 8);
-            Win32Util.SafeNativeMethods.SetWindowPos(_form.Handle, Win32Util.NativeMethods.HWND_TOPMOST, TLX_, TLY_, width_, height_, 0x10);
+            int num1 = Win32Util.GetWindowLong(_form.Handle, -20);
+            Win32Util.SetWindowLong(_form.Handle, -20, num1 | 0x80);
+            Win32Util.ShowWindow(_form.Handle, 8);
+            Win32Util.SetWindowPos(_form.Handle, Win32Util.HWND_TOPMOST, TLX_, TLY_, width_, height_, 0x10);
         }
     }
 
@@ -434,10 +434,10 @@ namespace SPMouse
             const int WS_EX_LAYERED = 0x80000;
             const int WS_EX_TRANSPARENT = 0x20;
             const int SWP_NOACTIVATE = 0x0010;
-            int flags = Win32Util.UnsafeNativeMethods.GetWindowLong(f.Handle, -20); //get the "extended Window Styles" bitmask
-            Win32Util.UnsafeNativeMethods.SetWindowLong(f.Handle, -20, flags | WS_EX_LAYERED | WS_EX_TRANSPARENT);
+            int flags = Win32Util.GetWindowLong(f.Handle, -20); //get the "extended Window Styles" bitmask
+            Win32Util.SetWindowLong(f.Handle, -20, flags | WS_EX_LAYERED | WS_EX_TRANSPARENT);
 
-            Win32Util.SafeNativeMethods.ShowWindow(f.Handle, SWP_NOACTIVATE); //FIXME, does not actually show the form?
+            Win32Util.ShowWindow(f.Handle, SWP_NOACTIVATE); //FIXME, does not actually show the form?
 
             //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.control.paint?view=netframework-4.8
             //paint event is called when controll is redrawn, i need another event.

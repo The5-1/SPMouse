@@ -9,78 +9,43 @@ using System.Text;
 using System.Runtime.InteropServices;
 
 
-namespace Win32Util
+public static partial class Win32Util
 {
-    internal static class UnsafeNativeMethods
+    [DllImport("user32.dll")]
+    public static extern int GetClassName(IntPtr hwnd, StringBuilder lpClassName, int nMaxCount);
+    [DllImport("gdi32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern IntPtr GetCurrentObject(IntPtr hdc, uint objectType);
+    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern IntPtr GetDC(IntPtr hWnd);
+    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern IntPtr GetWindowDC(IntPtr hWnd);
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+    [DllImport("ntdll.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern void NtClose(IntPtr hToken);
+    [DllImport("ntdll.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern int NtOpenProcessToken(IntPtr hProcess, uint accessMask, out IntPtr hToken);
+    [DllImport("ntdll.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern int NtQueryInformationToken(IntPtr hToken, uint tokenElevationType, out IntPtr elevationInfo, uint bufferSize, out uint tokensize);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern bool RegisterHotKey(IntPtr hWnd, int atom, uint fsModifiers, uint vk);
+    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+    public static extern bool SetForegroundWindow(IntPtr hWnd);
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
+    [return: MarshalAs(UnmanagedType.Bool)]
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern bool UnregisterHotKey(IntPtr hWnd, int atom);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct TOKEN_ELEVATION_INFO
     {
-        [DllImport("user32.dll")]
-        internal static extern int GetClassName(IntPtr hwnd, StringBuilder lpClassName, int nMaxCount);
-        [DllImport("gdi32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        internal static extern IntPtr GetCurrentObject(IntPtr hdc, uint objectType);
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        internal static extern IntPtr GetDC(IntPtr hWnd);
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        internal static extern IntPtr GetWindowDC(IntPtr hWnd);
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        internal static extern int GetWindowLong(IntPtr hWnd, int nIndex);
-        [DllImport("ntdll.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        internal static extern void NtClose(IntPtr hToken);
-        [DllImport("ntdll.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        internal static extern int NtOpenProcessToken(IntPtr hProcess, uint accessMask, out IntPtr hToken);
-        [DllImport("ntdll.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        internal static extern int NtQueryInformationToken(IntPtr hToken, uint tokenElevationType, out IntPtr elevationInfo, uint bufferSize, out uint tokensize);
-        [return: MarshalAs(UnmanagedType.Bool)]
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        internal static extern bool RegisterHotKey(IntPtr hWnd, int atom, uint fsModifiers, uint vk);
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        internal static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
-        [return: MarshalAs(UnmanagedType.Bool)]
-        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
-        internal static extern bool SetForegroundWindow(IntPtr hWnd);
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        internal static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
-        [return: MarshalAs(UnmanagedType.Bool)]
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        internal static extern bool UnregisterHotKey(IntPtr hWnd, int atom);
-
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct TOKEN_ELEVATION_INFO
-        {
-            [MarshalAs(UnmanagedType.U4)]
-            internal uint TokenIsElevated;
-        }
-
-
-        [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        internal static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WindowCompositionAttributeData data);
-        public struct WindowCompositionAttributeData
-        {
-            public WindowCompositionAttribute Attribute;
-            public IntPtr Data;
-            public int SizeOfData;
-        }
-
-        public enum WindowCompositionAttribute
-        {
-            WCA_ACCENT_POLICY = 19
-        }
-
-        public enum AccentState
-        {
-            ACCENT_DISABLED = 0,
-            ACCENT_ENABLE_GRADIENT = 1,
-            ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
-            ACCENT_ENABLE_BLURBEHIND = 3,
-            ACCENT_INVALID_STATE = 4
-        }
-
-        public struct AccentPolicy
-        {
-            public AccentState AccentState;
-            public int AccentFlags;
-            public int GradientColor;
-            public int AnimationId;
-        }
-
+        [MarshalAs(UnmanagedType.U4)]
+        public uint TokenIsElevated;
     }
+
 }

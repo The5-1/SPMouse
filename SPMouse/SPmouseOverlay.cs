@@ -6,15 +6,39 @@ namespace SPMouse
 {
     public class SPMouseOverlay : System.Windows.Forms.Form
     {
+        public void init(Icon icon)
+        {
+            this.ClientSize = new System.Drawing.Size(256, 256);
+            this.Name = "SPMouse Overlay";
+            this.Text = "SPMouse Overlay";
+            this.Icon = icon;
+            this.Load += new System.EventHandler(this.SPMouseOverlay_Load);
+            this.ShowInTaskbar = false;
+            this.TopMost = true;
+            this.FormBorderStyle = FormBorderStyle.None;
+            this.WindowState = FormWindowState.Maximized;
+            this.AllowTransparency = true;
+            this.BackColor = Color.FromArgb(255, 0, 0, 0);
+            this.TransparencyKey = this.BackColor;
+
+            Win32Util.SetWindowLong(this.Handle, -20, Win32Util.GetWindowLong(this.Handle, -20) | 0x80000 | 0x20);
+        }
+
+        //Hide the form from Alt+Tab by making it a "Tool Window"
+        protected override CreateParams CreateParams
+        {
+            get
+            {
+                CreateParams cp = base.CreateParams;
+                // turn on WS_EX_TOOLWINDOW style bit
+                cp.ExStyle |= 0x80;
+                return cp;
+            }
+        }
+
         private void InitializeComponent()
         {
             this.SuspendLayout();
-            // 
-            // SPMouseOverlay
-            // 
-            this.ClientSize = new System.Drawing.Size(284, 261);
-            this.Name = "SPMouseOverlay";
-            this.Load += new System.EventHandler(this.SPMouseOverlay_Load);
             this.ResumeLayout(false);
 
         }
