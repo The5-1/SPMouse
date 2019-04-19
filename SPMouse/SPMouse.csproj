@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{37C3152D-537C-4D30-83AC-81670539B9A1}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <RootNamespace>SPMouse</RootNamespace>
     <AssemblyName>SPMouse</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -32,6 +32,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>SPM_Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,14 +52,37 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Example.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SPmouse.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SPmouseOverlay.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Win32\nativemethods.cs" />
     <Compile Include="Win32\safenativemethods.cs" />
     <Compile Include="Win32\unsafenativemethods.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Example.resx">
+      <DependentUpon>Example.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SPmouse.resx">
+      <DependentUpon>SPmouse.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SPmouseOverlay.resx">
+      <DependentUpon>SPmouseOverlay.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="SPM_Icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

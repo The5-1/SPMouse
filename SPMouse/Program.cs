@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Numerics;
 
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 /* The interop is used to call native windwos methods via DllImport and pInvoke
 ** https://docs.microsoft.com/en-us/dotnet/framework/interop/index
@@ -274,7 +275,7 @@ namespace SPMouse
         }
     }
 
-    static class SPMouse
+    static class SPMouse_Test
     {
         static float maxdist = 32f;
 
@@ -290,7 +291,7 @@ namespace SPMouse
         public static float towTension;
 
 
-        static SPMouse()
+        static SPMouse_Test()
         {
 
         }
@@ -406,11 +407,13 @@ namespace SPMouse
 
     static class FormsTest2
     {
+        static GraphicsPath mousePath = new GraphicsPath();
+        static Form f;
         public static void test01()
         {
             Color transparencyKey = Color.FromArgb(255, 255, 0, 255);
 
-            Form f = new Form();
+            f = new Form();
             f.Text = "SPM - Surgical Precision Mousing";
             f.WindowState = FormWindowState.Maximized;
             f.ShowInTaskbar = false;
@@ -418,8 +421,8 @@ namespace SPMouse
             f.TopMost = true;
             f.FormBorderStyle = FormBorderStyle.None;
             f.BackColor = transparencyKey;
-            //f.TransparencyKey = transparencyKey;
-            f.Opacity = 0.1;
+            f.TransparencyKey = transparencyKey;
+            f.Opacity = 1.0;
             f.AllowTransparency = true;
             f.Show();
             //f.Hide();
@@ -438,31 +441,59 @@ namespace SPMouse
 
             //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.control.paint?view=netframework-4.8
             //paint event is called when controll is redrawn, i need another event.
-            f.Paint += new System.Windows.Forms.PaintEventHandler(FormsTest2.paintCallback);
+            f.Paint += new PaintEventHandler(FormsTest2.paintCallback);
+            f.MouseMove += new MouseEventHandler(FormsTest2.mouseMoveCallback);
             f.Update();
         }
 
         public static void paintCallback(object sender, System.Windows.Forms.PaintEventArgs e)
         {
+            Console.WriteLine("Redraw");
             Graphics g = e.Graphics;
             // Draw a line in the PictureBox.
             g.DrawLine(System.Drawing.Pens.Red, 0,0, 1000, 1000);
+            e.Graphics.DrawPath(System.Drawing.Pens.DarkRed, mousePath);
         }
+
+        public static void mouseMoveCallback(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            // Update the mouse path that is drawn onto the Panel.
+            int mouseX = e.X;
+            int mouseY = e.Y;
+            Console.WriteLine("M_move: {0} {1}", mouseX, mouseY);
+
+            mousePath.AddLine(mouseX, mouseY, mouseX, mouseY);
+            f.Invalidate();
+            f.Refresh();
+        }
+
+        public static void mouseDownCallback(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            // Update the mouse path that is drawn onto the Panel.
+            int mouseX = e.X;
+            int mouseY = e.Y;
+            Console.WriteLine("M_down: {0} {1}", mouseX, mouseY);
+
+            f.Focus();
+            f.Invalidate();
+            f.Refresh();
+        }
+
     }
 
 
     class App
     {
-        static void Main(string[] args)
+        static void MainTest(string[] args)
         {
 
             //FormsTest1.test01();
 
             FormsTest2.test01();
 
-            while (true) ;
+            //while (true) ;
 
-            //SPMouse.init();
+            //SPMouse_Test.init();
 
             //Console.WriteLine("Hello: {0}", "test");
 
