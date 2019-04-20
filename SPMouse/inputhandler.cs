@@ -123,14 +123,11 @@ namespace SPMouse
                 }
 
 
-                bool moves = false;
+                bool moves;
                 if ((Win32Util.MouseMessages)wParam == Win32Util.MouseMessages.WM_MOUSEMOVE)
                 {
-                    m_pos.X = hookStruct.pt.x;
-                    m_pos.Y = hookStruct.pt.y;
-
-                    newState.pos = m_pos;
-
+                    newState.pos.X = hookStruct.pt.x;
+                    newState.pos.Y = hookStruct.pt.y;
                     m_pos_delta.X = newState.pos.X - previousState.pos.X;
                     m_pos_delta.Y = newState.pos.Y - previousState.pos.Y;
                     //Console.WriteLine("delta: x{0} y{1}", m_pos_delta.X, m_pos_delta.Y);
@@ -140,21 +137,18 @@ namespace SPMouse
                 {
                     m_pos_delta.X = 0;
                     m_pos_delta.Y = 0;
-                }
-
-                if (newState.LMB && !moves)
-                {
-                    ropeLogic.start(VectorUtil.toVec(m_pos));
+                    moves = false;
                 }
 
                 //painting happened, we need to intercept
                 if (m_LMB_held && moves)
                 {
-                    ropeLogic.update(VectorUtil.toVec(m_pos),VectorUtil.toVec(m_pos_delta));
+                    ropeLogic.update(VectorUtil.toVec(newState.pos),VectorUtil.toVec(m_pos_delta));
 
                     callCallbacks(ropeLogic.cursorPoint, ropeLogic.pullPoint, true);
 
                     Win32Util.SetCursorPos(ropeLogic.cursorPoint.X, ropeLogic.cursorPoint.Y);
+                    newState.pos = ropeLogic.cursorPoint;
 
                     //Console.WriteLine("intercepting: x{0} y{1}", ropeLogic.cursorPoint.X, ropeLogic.cursorPoint.Y);
 
