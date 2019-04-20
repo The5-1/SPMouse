@@ -6,8 +6,6 @@ namespace SPMouse
 {
     public class SPMouseOverlay : System.Windows.Forms.Form
     {
-        
-
         public void init(Icon icon)
         {
             this.ClientSize = new System.Drawing.Size(256, 256);

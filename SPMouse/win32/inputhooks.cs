@@ -38,7 +38,7 @@ public static partial class Win32Util
     ** Returns:
     **      Hook pointer neded for releasing the hook or handling callbacks
     */
-    private static IntPtr registerLowLevelMouseCallback(LowLevelMouseProc proc)
+    public static IntPtr registerLowLevelMouseCallback(LowLevelMouseProc proc)
     {
         return SetWindowsHookEx(
             WH_MOUSE_LL, //Hook Location ID
@@ -48,12 +48,12 @@ public static partial class Win32Util
             );
     }
 
-    private static bool releaseLowLevelMouseCallback(IntPtr hookptr)
+    public static bool releaseLowLevelMouseCallback(IntPtr hookptr)
     {
         return UnhookWindowsHookEx(hookptr);
     }
 
-    private static IntPtr exsampleHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+    public static IntPtr exsampleHookCallback(int nCode, IntPtr wParam, IntPtr lParam)
     {
         if (nCode == HC_ACTION && (MouseMessages)wParam == MouseMessages.WM_MOUSEMOVE)
         {
@@ -77,14 +77,14 @@ public static partial class Win32Util
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct POINT
+    public struct POINT
     {
         public int x;
         public int y;
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct MSLLHOOKSTRUCT
+    public struct MSLLHOOKSTRUCT
     {
 
         public POINT pt;
@@ -96,7 +96,7 @@ public static partial class Win32Util
 
     //https://docs.microsoft.com/en-us/windows/desktop/api/winuser/ns-winuser-taginput
     [StructLayout(LayoutKind.Sequential)]
-    internal struct INPUT
+    public struct INPUT
     {
         public uint Type;
         public MOUSEKEYBDHARDWAREINPUT Data;
@@ -104,7 +104,7 @@ public static partial class Win32Util
 
     //https://docs.microsoft.com/en-us/windows/desktop/api/winuser/ns-winuser-tagmouseinput
     [StructLayout(LayoutKind.Explicit)] // LayoutKind.Explicit = Union
-    internal struct MOUSEKEYBDHARDWAREINPUT
+    public struct MOUSEKEYBDHARDWAREINPUT
     {
         [FieldOffset(0)]
         public HARDWAREINPUT Hardware;
@@ -115,7 +115,7 @@ public static partial class Win32Util
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct HARDWAREINPUT
+    public struct HARDWAREINPUT
     {
         public uint Msg;
         public ushort ParamL;
@@ -123,7 +123,7 @@ public static partial class Win32Util
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct KEYBDINPUT
+    public struct KEYBDINPUT
     {
         public ushort Vk;
         public ushort Scan;
@@ -133,7 +133,7 @@ public static partial class Win32Util
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    internal struct MOUSEINPUT
+    public struct MOUSEINPUT
     {
         public int X;
         public int Y;
@@ -144,25 +144,25 @@ public static partial class Win32Util
     }
 
     [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
+    public static extern IntPtr SetWindowsHookEx(int idHook, LowLevelMouseProc lpfn, IntPtr hMod, uint dwThreadId);
 
     [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool UnhookWindowsHookEx(IntPtr hhk);
+    public static extern bool UnhookWindowsHookEx(IntPtr hhk);
 
     [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
+    public static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
 
     [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, ref MSLLHOOKSTRUCT lParam);
+    public static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, ref MSLLHOOKSTRUCT lParam);
 
     [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern IntPtr GetModuleHandle(string lpModuleName);
+    public static extern IntPtr GetModuleHandle(string lpModuleName);
 
     [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
     public static extern long SetCursorPos(int x, int y);
 
     [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    internal static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray), In] INPUT[] pInputs, int cbSize);
+    public static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray), In] INPUT[] pInputs, int cbSize);
 
 }
