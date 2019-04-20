@@ -9,8 +9,13 @@ namespace SPMouse
         public float ropeLength = 32f;
 
         private bool initialized = false;
+
         private Vector2 cursorPos;
         private Vector2 pullPos;
+
+        public Point cursorPoint;
+        public Point pullPoint;
+
         private Vector2 newIn;
         private Vector2 prevIn;
         private Vector2 mouseDelta;
@@ -19,6 +24,11 @@ namespace SPMouse
         private float ropeDist;
         private float ropeTension;
 
+
+        public void update(int x, int y)
+        {
+            update(new Vector2(x, y));
+        }
         public void update(Vector2 mouseIn)
         {
             if (!initialized)
@@ -47,6 +57,14 @@ namespace SPMouse
             ropeTension = (float)(Math.Max(0.0, ropeDist - ropeLength));
 
             cursorPos += Vector2.Multiply(ropeTension, ropeDir);
+
+            prevIn = mouseIn;
+
+            cursorPoint.X = (int)cursorPos.X;
+            cursorPoint.Y = (int)cursorPos.Y;
+
+            pullPoint.X = (int)pullPos.X;
+            pullPoint.Y = (int)pullPos.Y;
         }
 
         public static Point toPoint(Vector2 vec)
@@ -57,14 +75,6 @@ namespace SPMouse
         public static Vector2 toVec(Point p)
         {
             return new Vector2(p.X, p.Y);
-        }
-
-        public Point getPullPos() {
-            return toPoint(pullPos);
-        }
-        public Point getCursorPos()
-        {
-            return toPoint(cursorPos);
         }
     }
 }

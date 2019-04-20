@@ -25,7 +25,6 @@ namespace SPMouse
 
 
         private SPMouseOverlay overlay;
-
         private InputHandler m_input;
 
         static void Main()
@@ -42,8 +41,6 @@ namespace SPMouse
 
         public SPMouse()
         {
-
-
             //Loads Resources from the Project Properties!
             SPMouse.icon = Properties.Resources.SPM_Icon;
 
@@ -106,11 +103,12 @@ namespace SPMouse
             });
 
 
-            //Overlay
-            overlay = new SPMouseOverlay();
-            overlay.init(icon);
-            overlay.Show();
+            m_input = new InputHandler();
 
+            //Overlay
+            overlay = new SPMouseOverlay(icon, m_input);
+            overlay.Show();
+            
             //Add controls
             this.Controls.AddRange(new System.Windows.Forms.Control[] {
                 label1
@@ -153,7 +151,6 @@ namespace SPMouse
         {
             if (!m_running)
             {
-                m_input = new InputHandler();
                 m_input.start();
                 tray_menu_startstop.Text = "Stop";
                 m_running = true;
@@ -162,7 +159,6 @@ namespace SPMouse
             else
             {
                 m_input.stop();
-                m_input = null;
                 tray_menu_startstop.Text = "Start";
                 m_running = false;
                 overlay.Visible = false;

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -14,11 +15,11 @@ namespace SPMouse
         private IntPtr m_nativeHookPtr;
         private Win32Util.LowLevelMouseProc m_managedCallbackObject; //prevent callback from being garbage collected while native still uses it!
 
-        public delegate void NotifyPosCallaback(Point p);
+        public delegate void NotifyPosCallaback(Point cursorPos, Point pullPos);
 
-        NotifyPosCallaback originalPos;
-        NotifyPosCallaback draggerPos;
+        private List<NotifyPosCallaback> callbacks = new List<NotifyPosCallaback>();
 
+        public RopeLogic ropeLogic = new RopeLogic();
 
         private bool m_LMB_held;
         private bool m_RMB_held;
@@ -101,18 +102,24 @@ namespace SPMouse
                     m_pos.Y = hookStruct.pt.y;
                     moves = true;
                 }
+
+                ropeLogic.update(RopeLogic.toVec(m_pos));
+                callCallbacks(ropeLogic.cursorPoint, ropeLogic.pullPoint);
+
                 //painting happened, we need to intercept
                 if (m_LMB_held && moves)
                 {
+                                
+                    Win32Util.SetCursorPos(ropeLogic.cursorPoint.X, ropeLogic.cursorPoint.Y);
 
-                    Console.WriteLine("intercepting");
-                    Win32Util.SetCursorPos(hookStruct.pt.x, hookStruct.pt.y);
+                    Console.WriteLine("intercepting: x{0} y{1}", ropeLogic.cursorPoint.X, ropeLogic.cursorPoint.Y);
 
                     return (IntPtr)1;
                 }
                 else 
                 {
                     Console.WriteLine("x{0} y{1} {2} {3}", m_pos.X, m_pos.Y, m_LMB_held ? "L" : " ", m_RMB_held ? "R" : " ");
+
                     return Win32Util.CallNextHookEx(m_nativeHookPtr, nCode, wParam, lParam);
                 }
 
@@ -147,6 +154,19 @@ namespace SPMouse
             return Win32Util.CallNextHookEx(m_nativeHookPtr, nCode, wParam, lParam);
         }
 
+
+        public void registerUpdateCallback(NotifyPosCallaback callback)
+        {
+            callbacks.Add(callback);
+        }
+
+        public void callCallbacks(Point cursorPos, Point pullPos)
+        {
+            foreach(var callback in callbacks)
+            {
+                callback(cursorPos, pullPos);
+            }
+        }
     }
 
 
