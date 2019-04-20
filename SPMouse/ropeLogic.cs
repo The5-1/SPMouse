@@ -6,7 +6,7 @@ namespace SPMouse
 {
     public class RopeLogic
     {
-        public float ropeLength = 32f;
+        public float ropeLength = 128f;
 
         private bool initialized = false;
 
