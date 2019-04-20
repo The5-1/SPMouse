@@ -12,6 +12,7 @@ namespace SPMouse
 
         private Point cursorPos;
         private Point pullPos;
+        private bool drawing;
 
         private Pen penRope;
         private Pen penRopeA;
@@ -47,10 +48,11 @@ namespace SPMouse
             this.Paint += onRedraw;
         }
 
-        public void update(Point cursorPos, Point pullPos)
+        public void update(Point cursorPos, Point pullPos, bool drawing)
         {
             this.cursorPos = cursorPos;
             this.pullPos = pullPos;
+            this.drawing = drawing;
 
             //Update VS Invalidate VS Refresh: https://blogs.msdn.microsoft.com/subhagpo/2005/02/22/whats-the-difference-between-control-invalidate-control-update-and-control-refresh/
             this.Invalidate(); //invalidates a region and queues it for redrawing

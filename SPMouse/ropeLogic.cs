@@ -6,41 +6,33 @@ namespace SPMouse
 {
     public class RopeLogic
     {
-        private bool initialized = false;
-
         private Vector2 cursorPos;
         private Vector2 pullPos;
 
         public Point cursorPoint;
         public Point pullPoint;
 
-        private Vector2 newIn;
-        private Vector2 prevIn;
-        private Vector2 mouseDelta;
         private Vector2 ropeDelta;
         private Vector2 ropeDir;
         private float ropeDist;
         private float ropeTension;
 
 
-        public void update(int x, int y)
+        public void update(int x, int y, int dx, int dy)
         {
-            update(new Vector2(x, y));
+            update(new Vector2(x, y), new Vector2(dx,dy));
         }
-        public void update(Vector2 mouseIn)
+
+        public void start(Vector2 mouseIn)
         {
-            if (!initialized)
-            {
-                cursorPos = mouseIn;
-                pullPos = mouseIn;
-                newIn = mouseIn;
-                prevIn = mouseIn;
-                initialized = true;
-            }
+            cursorPos = mouseIn;
+            pullPos = mouseIn;
+            //Console.WriteLine("rope reset");
+        }
 
-            newIn = mouseIn;
-
-            Vector2 mouseDelta = newIn - prevIn;
+        public void update(Vector2 mouseIn, Vector2 mouseDelta)
+        {
+            Console.WriteLine("delta: x{0} y{1}", mouseDelta.X, mouseDelta.Y);
 
             pullPos += mouseDelta;
             ropeDelta = pullPos - cursorPos;
@@ -53,10 +45,9 @@ namespace SPMouse
             }
 
             ropeTension = (float)(Math.Max(0.0, ropeDist - SPMouse.settings.sRopeLength));
+            //Console.WriteLine("dist: " + ropeDist + " tension: " + ropeTension);
 
             cursorPos += Vector2.Multiply(ropeTension, ropeDir);
-
-            prevIn = mouseIn;
 
             cursorPoint.X = (int)cursorPos.X;
             cursorPoint.Y = (int)cursorPos.Y;

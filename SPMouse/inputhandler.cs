@@ -12,18 +12,32 @@ namespace SPMouse
 {
     public class InputHandler
     {
+        private struct State
+        {
+            public bool LMB;
+            public bool RMB;
+            public Point pos;
+        }
+
+        private State previousState;
+        private State newState;
+
+
         private IntPtr m_nativeHookPtr;
         private Win32Util.LowLevelMouseProc m_managedCallbackObject; //prevent callback from being garbage collected while native still uses it!
 
-        public delegate void NotifyPosCallaback(Point cursorPos, Point pullPos);
+        public delegate void NotifyPosCallaback(Point cursorPos, Point pullPos, bool drawing);
 
         private List<NotifyPosCallaback> callbacks = new List<NotifyPosCallaback>();
 
         public RopeLogic ropeLogic = new RopeLogic();
 
         private bool m_LMB_held;
+        private bool m_LMB_clicked;
         private bool m_RMB_held;
+        private bool m_RMB_clicked;
         private Point m_pos = new Point();
+        private Point m_pos_delta = new Point();
 
         public InputHandler()
         {
@@ -77,49 +91,85 @@ namespace SPMouse
 
         private IntPtr interceptInput(int nCode, IntPtr wParam, IntPtr lParam)
         {
-            if(nCode == Win32Util.HC_ACTION)
+            if (nCode == Win32Util.HC_ACTION)
             {
+                newState = previousState;
+
                 Win32Util.MSLLHOOKSTRUCT hookStruct = (Win32Util.MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(Win32Util.MSLLHOOKSTRUCT));
                 if ((Win32Util.MouseMessages)wParam == Win32Util.MouseMessages.WM_LBUTTONDOWN){
-                    m_LMB_held = true;
+                    newState.LMB = true;                   
                 }
+
                 if ((Win32Util.MouseMessages)wParam == Win32Util.MouseMessages.WM_LBUTTONUP){
+                    newState.LMB = false;
                     m_LMB_held = false;
                 }
-                if ((Win32Util.MouseMessages)wParam == Win32Util.MouseMessages.WM_RBUTTONDOWN)
-                {
-                    m_RMB_held = true;
+                else {
+                    //if we do not release LMB and it was previously also pressed
+                    if (previousState.LMB) m_LMB_held = true;
                 }
-                if ((Win32Util.MouseMessages)wParam == Win32Util.MouseMessages.WM_RBUTTONUP)
-                {
+
+                if ((Win32Util.MouseMessages)wParam == Win32Util.MouseMessages.WM_RBUTTONDOWN){
+                    newState.RMB = true;
+                }
+
+                if ((Win32Util.MouseMessages)wParam == Win32Util.MouseMessages.WM_RBUTTONUP){
+                    newState.RMB = false;
                     m_RMB_held = false;
                 }
+                else {
+                    //if we do not release LMB and it was previously also pressed
+                    if (previousState.RMB) m_LMB_held = true;
+                }
+
 
                 bool moves = false;
                 if ((Win32Util.MouseMessages)wParam == Win32Util.MouseMessages.WM_MOUSEMOVE)
                 {
                     m_pos.X = hookStruct.pt.x;
                     m_pos.Y = hookStruct.pt.y;
+
+                    newState.pos = m_pos;
+
+                    m_pos_delta.X = newState.pos.X - previousState.pos.X;
+                    m_pos_delta.Y = newState.pos.Y - previousState.pos.Y;
+                    //Console.WriteLine("delta: x{0} y{1}", m_pos_delta.X, m_pos_delta.Y);
                     moves = true;
                 }
+                else
+                {
+                    m_pos_delta.X = 0;
+                    m_pos_delta.Y = 0;
+                }
 
-                ropeLogic.update(VectorUtil.toVec(m_pos));
-                callCallbacks(ropeLogic.cursorPoint, ropeLogic.pullPoint);
+                if (newState.LMB && !moves)
+                {
+                    ropeLogic.start(VectorUtil.toVec(m_pos));
+                }
 
                 //painting happened, we need to intercept
                 if (m_LMB_held && moves)
                 {
-                                
+                    ropeLogic.update(VectorUtil.toVec(m_pos),VectorUtil.toVec(m_pos_delta));
+
+                    callCallbacks(ropeLogic.cursorPoint, ropeLogic.pullPoint, true);
+
                     Win32Util.SetCursorPos(ropeLogic.cursorPoint.X, ropeLogic.cursorPoint.Y);
 
-                    Console.WriteLine("intercepting: x{0} y{1}", ropeLogic.cursorPoint.X, ropeLogic.cursorPoint.Y);
+                    //Console.WriteLine("intercepting: x{0} y{1}", ropeLogic.cursorPoint.X, ropeLogic.cursorPoint.Y);
 
+                    previousState = newState;
                     return (IntPtr)1;
                 }
                 else 
                 {
-                    Console.WriteLine("x{0} y{1} {2} {3}", m_pos.X, m_pos.Y, m_LMB_held ? "L" : " ", m_RMB_held ? "R" : " ");
+                    //Console.WriteLine("x{0} y{1} {2} {3}", m_pos.X, m_pos.Y, m_LMB_held ? "L" : " ", m_RMB_held ? "R" : " ");
 
+                    ropeLogic.start(VectorUtil.toVec(m_pos));
+
+                    callCallbacks(ropeLogic.cursorPoint, ropeLogic.pullPoint, false);
+
+                    previousState = newState;
                     return Win32Util.CallNextHookEx(m_nativeHookPtr, nCode, wParam, lParam);
                 }
 
@@ -160,11 +210,11 @@ namespace SPMouse
             callbacks.Add(callback);
         }
 
-        public void callCallbacks(Point cursorPos, Point pullPos)
+        public void callCallbacks(Point cursorPos, Point pullPos, bool drawing)
         {
             foreach(var callback in callbacks)
             {
-                callback(cursorPos, pullPos);
+                callback(cursorPos, pullPos, drawing);
             }
         }
     }
