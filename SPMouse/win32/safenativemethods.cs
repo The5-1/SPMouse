@@ -3,6 +3,8 @@
 // See http://www.microsoft.com/opensource/licenses.mspx#Ms-PL.
 // All other rights reserved.
 
+//from https://archive.codeplex.com/?p=uiautomationverify
+
 using System;
 using System.Collections.Generic;
 using System.Text;

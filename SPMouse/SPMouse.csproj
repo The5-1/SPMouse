@@ -57,6 +57,7 @@
     <Compile Include="Example.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="mouseinput.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -70,7 +71,8 @@
     <Compile Include="SPmouseOverlay.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Win32\formsExtensions.cs" />
+    <Compile Include="Win32\clicktrough.cs" />
+    <Compile Include="Win32\inputhooks.cs" />
     <Compile Include="Win32\nativemethods.cs" />
     <Compile Include="Win32\safenativemethods.cs" />
     <Compile Include="Win32\systemcolors.cs" />

@@ -3,6 +3,8 @@
 // See http://www.microsoft.com/opensource/licenses.mspx#Ms-PL.
 // All other rights reserved.
 
+//from https://archive.codeplex.com/?p=uiautomationverify
+
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -10,7 +12,7 @@ using System.Text;
 public static partial class Win32Util
 {
     public const int DLGC_STATIC = 0x100;
-    public const int GWL_EXSTYLE = -20;
+    public const int GWL_EXSTYLE = -20; //bitmask for extended styling options
     public static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
     public const uint MOD_ALT = 1;
     public const uint MOD_CONTROL = 2;
@@ -34,5 +36,8 @@ public static partial class Win32Util
     public const int WM_KEYDOWN = 0x100;
     public const int WM_NCLBUTTONDBLCLK = 0xa3;
     public const int WS_EX_TOOLWINDOW = 0x80;
+
+    public const int WS_EX_LAYERED = 0x80000;
+    public const int WS_EX_TRANSPARENT = 0x20;
 }
 

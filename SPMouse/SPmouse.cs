@@ -2,7 +2,6 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-using FormsExtensions;
 
 namespace SPMouse
 {
@@ -17,6 +16,7 @@ namespace SPMouse
 
         private NotifyIcon tray = new NotifyIcon();
         private ContextMenu tray_menu = new ContextMenu();
+        private MenuItem tray_menu_startstop = new MenuItem();
         private MenuItem tray_menu_exit = new MenuItem();
 
 
@@ -24,6 +24,11 @@ namespace SPMouse
 
         static void Main()
         {
+
+#if false
+            App.DrawOnScreenTest();
+#endif 
+
             Application.EnableVisualStyles(); //Enable Win10 Styling
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new SPMouse());
@@ -70,10 +75,13 @@ namespace SPMouse
             //Tray context Menu: https://docs.microsoft.com/de-de/dotnet/api/system.windows.forms.notifyicon.contextmenu?view=netframework-4.8
             tray.ContextMenu = tray_menu;
 
+            tray_menu_startstop.Text = "Stop";
+
             tray_menu_exit.Text = "E&xit";
             tray_menu_exit.Click += new System.EventHandler(this.exit);
 
             tray.ContextMenu.MenuItems.AddRange( new System.Windows.Forms.MenuItem[]{
+                this.tray_menu_startstop,
                 this.tray_menu_exit
             });
 
@@ -90,6 +98,8 @@ namespace SPMouse
 
             //Setup callbacks
             this.Resize += this.resizeCallback;
+            this.MouseMove += this.mouseMoveCallback;
+
             this.tray.MouseDoubleClick += this.notifyIconClickedCallback;
         }
 
@@ -144,5 +154,33 @@ namespace SPMouse
         {
 
         }
+
+
+        //only called when mouse is inside the Form
+        private void mouseMoveCallback(object sender, MouseEventArgs e)
+        {
+            int mouseX = e.X;
+            int mouseY = e.Y;
+
+            MoveCursorTest();
+        }
+
+        private void MoveCursorTest()
+        {
+            var cpy = Cursor.Current;
+
+            //Get a pointer to the current cursor
+            this.Cursor = new Cursor(Cursor.Current.Handle);
+
+            //set the position
+            Cursor.Position = new Point(960, 560);
+
+            //limit cursor region, defaults to whole screen
+            //Cursor.Clip = new Rectangle(this.Location, this.Size);
+        }
+
     }
+
+
+
 }

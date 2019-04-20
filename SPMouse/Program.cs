@@ -275,9 +275,12 @@ namespace SPMouse
         }
     }
 
+
+    //Direct drawing onto desktop without form
+    //Method1 from here: https://stackoverflow.com/questions/14385838/draw-on-screen-without-form
     static class SPMouse_Test
     {
-        static float maxdist = 32f;
+        static float maxdist = 128f;
 
         public static Vector2 previousMousePos = new Vector2();
         public static Vector2 currentMousePos = new Vector2();
@@ -481,32 +484,49 @@ namespace SPMouse
 
     }
 
-
     class App
     {
+        public static void DrawOnScreenTest()
+        {
+            SPMouse_Test.init();
+
+            Console.WriteLine("Hello: {0}", "test");
+
+            while (true)
+            {
+                if (SPMouse_Test.updatePositions())
+                {
+                    //SceenUtil.test();
+                    SPMouse_Test.applyCursorManipulation();
+                    //SPMouse.debug();
+                }
+                SPMouse_Test.draw();
+            }
+        }
+
         static void MainTest(string[] args)
         {
 
             //FormsTest1.test01();
 
-            FormsTest2.test01();
+            //FormsTest2.test01();
 
             //while (true) ;
 
-            //SPMouse_Test.init();
+            SPMouse_Test.init();
 
-            //Console.WriteLine("Hello: {0}", "test");
+            Console.WriteLine("Hello: {0}", "test");
 
-            //while (true)
-            //{
-            //    if (SPMouse.updatePositions())
-            //    {
-            //        //SceenUtil.test();
-            //        SPMouse.applyCursorManipulation();
-            //        //SPMouse.debug();
-            //    }
-            //    SPMouse.draw();
-            //}
+            while (true)
+            {
+                if (SPMouse_Test.updatePositions())
+                {
+                    //SceenUtil.test();
+                    SPMouse_Test.applyCursorManipulation();
+                    //SPMouse.debug();
+                }
+                SPMouse_Test.draw();
+            }
         }
     }
 }

@@ -6,6 +6,8 @@ namespace SPMouse
 {
     public class SPMouseOverlay : System.Windows.Forms.Form
     {
+        
+
         public void init(Icon icon)
         {
             this.ClientSize = new System.Drawing.Size(256, 256);
@@ -19,9 +21,10 @@ namespace SPMouse
             this.WindowState = FormWindowState.Maximized;
             this.AllowTransparency = true;
             this.BackColor = Color.FromArgb(255, 0, 0, 0);
-            this.TransparencyKey = this.BackColor;
+            //this.TransparencyKey = this.BackColor;
+            this.Opacity = 0.5;
 
-            Win32Util.SetWindowLong(this.Handle, -20, Win32Util.GetWindowLong(this.Handle, -20) | 0x80000 | 0x20);
+            this.makeKlicktrough();
         }
 
         //Hide the form from Alt+Tab by making it a "Tool Window"

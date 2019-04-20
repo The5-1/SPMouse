@@ -41,11 +41,19 @@ public static partial class Win32Util
     }
 }
 
-public static class WindowExtension
+public static partial class WindowExtension
 {
+    //https://stackoverflow.com/questions/1596961/anti-aliased-text-in-a-transparent-net-form/1597044
+    //https://stackoverflow.com/questions/1291061/antialiased-text-on-transparent-bitmap
+    //https://blogs.msdn.microsoft.com/mswanson/2005/07/07/transparent-window-sample/
+    public static void antialiasedTransparentBackground(this Form @this)
+    {
+
+    }
+
 
     // https://www.codeproject.com/Answers/1174965/How-can-I-make-my-form-like-windows-blurr-effect-o#answer3
-    public static void EnableBlur(this Form @this)
+    public static void enableBlur(this Form @this)
     {
         var accent = new Win32Util.AccentPolicy();
         accent.AccentState = Win32Util.AccentState.ACCENT_ENABLE_BLURBEHIND;
