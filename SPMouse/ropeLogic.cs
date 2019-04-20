@@ -23,11 +23,11 @@ namespace SPMouse
             update(new Vector2(x, y), new Vector2(dx,dy));
         }
 
-        public void start(Vector2 mouseIn)
+        public void reset(Vector2 mouseIn)
         {
             cursorPos = mouseIn;
             pullPos = mouseIn;
-            //Console.WriteLine("rope reset");
+            Console.WriteLine("reset: x{0} y{1}", mouseIn.X, mouseIn.Y);
         }
 
         public void update(Vector2 mouseIn, Vector2 mouseDelta)

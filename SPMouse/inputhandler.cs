@@ -37,7 +37,7 @@ namespace SPMouse
         private bool m_RMB_held;
         private bool m_RMB_clicked;
         private Point m_pos = new Point();
-        private Point m_pos_delta = new Point();
+        private Point m_delta = new Point();
 
         public InputHandler()
         {
@@ -128,22 +128,22 @@ namespace SPMouse
                 {
                     newState.pos.X = hookStruct.pt.x;
                     newState.pos.Y = hookStruct.pt.y;
-                    m_pos_delta.X = newState.pos.X - previousState.pos.X;
-                    m_pos_delta.Y = newState.pos.Y - previousState.pos.Y;
+                    m_delta.X = newState.pos.X - previousState.pos.X;
+                    m_delta.Y = newState.pos.Y - previousState.pos.Y;
                     //Console.WriteLine("delta: x{0} y{1}", m_pos_delta.X, m_pos_delta.Y);
                     moves = true;
                 }
                 else
                 {
-                    m_pos_delta.X = 0;
-                    m_pos_delta.Y = 0;
+                    m_delta.X = 0;
+                    m_delta.Y = 0;
                     moves = false;
                 }
 
                 //painting happened, we need to intercept
                 if (m_LMB_held && moves)
                 {
-                    ropeLogic.update(VectorUtil.toVec(newState.pos),VectorUtil.toVec(m_pos_delta));
+                    ropeLogic.update(VectorUtil.toVec(newState.pos),VectorUtil.toVec(m_delta));
 
                     callCallbacks(ropeLogic.cursorPoint, ropeLogic.pullPoint, true);
 
@@ -159,7 +159,7 @@ namespace SPMouse
                 {
                     //Console.WriteLine("x{0} y{1} {2} {3}", m_pos.X, m_pos.Y, m_LMB_held ? "L" : " ", m_RMB_held ? "R" : " ");
 
-                    ropeLogic.start(VectorUtil.toVec(m_pos));
+                    ropeLogic.reset(VectorUtil.toVec(newState.pos));
 
                     callCallbacks(ropeLogic.cursorPoint, ropeLogic.pullPoint, false);
 
