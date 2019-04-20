@@ -6,8 +6,6 @@ namespace SPMouse
 {
     public class RopeLogic
     {
-        public float ropeLength = 128f;
-
         private bool initialized = false;
 
         private Vector2 cursorPos;
@@ -54,7 +52,7 @@ namespace SPMouse
                 ropeDir = Vector2.Normalize(ropeDelta);
             }
 
-            ropeTension = (float)(Math.Max(0.0, ropeDist - ropeLength));
+            ropeTension = (float)(Math.Max(0.0, ropeDist - SPMouse.settings.sRopeLength));
 
             cursorPos += Vector2.Multiply(ropeTension, ropeDir);
 
@@ -65,16 +63,6 @@ namespace SPMouse
 
             pullPoint.X = (int)pullPos.X;
             pullPoint.Y = (int)pullPos.Y;
-        }
-
-        public static Point toPoint(Vector2 vec)
-        {
-            return new Point((int)vec.X, (int)vec.Y);
-        }
-
-        public static Vector2 toVec(Point p)
-        {
-            return new Vector2(p.X, p.Y);
         }
     }
 }

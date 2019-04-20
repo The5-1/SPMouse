@@ -95,8 +95,10 @@
     <Compile Include="SPmouseOverlay.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="vectorUtil.cs" />
     <Compile Include="Win32\clicktrough.cs" />
     <Compile Include="Win32\inputhooks.cs" />
+    <Compile Include="Win32\layeredwindow.cs" />
     <Compile Include="Win32\nativemethods.cs" />
     <Compile Include="Win32\safenativemethods.cs" />
     <Compile Include="Win32\systemcolors.cs" />

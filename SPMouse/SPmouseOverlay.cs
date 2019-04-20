@@ -1,6 +1,7 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Numerics;
 
 namespace SPMouse
 {
@@ -11,6 +12,11 @@ namespace SPMouse
 
         private Point cursorPos;
         private Point pullPos;
+
+        private Pen penRope;
+        private Pen penRopeA;
+        private Pen penRopeB;
+
         public SPMouseOverlay(Icon icon, InputHandler inputhandler)
         {
             m_input = inputhandler;
@@ -18,18 +24,22 @@ namespace SPMouse
             this.Name = "SPMouse Overlay";
             this.Text = "SPMouse Overlay";
             this.Icon = icon;
-            this.Load += new System.EventHandler(this.SPMouseOverlay_Load);
             this.ShowInTaskbar = false;
             this.TopMost = true;
             this.FormBorderStyle = FormBorderStyle.None;
             this.WindowState = FormWindowState.Maximized;
+            this.MinimizeBox = this.MaximizeBox = false;
             this.AllowTransparency = true;
-            this.BackColor = Color.FromArgb(255, 0, 0, 0);
+            //this.BackColor = Color.FromArgb(255, 0, 0, 0);
+            this.BackColor = Color.Black;
             this.TransparencyKey = this.BackColor;
-            this.Opacity = 1;
+            this.Opacity = 1.0;
             this.DoubleBuffered = true;
+            //this.makeKlicktrough(); //we do it via override CreateParams instead;
 
-            this.makeKlicktrough();
+            penRope = new Pen(SPMouse.settings.sAccent, 2f);
+            penRopeA = new Pen(SPMouse.settings.sDarkgray, 3f);
+            penRopeB = new Pen(SPMouse.settings.sLightgray, 3f);
 
             m_updateCallback = new InputHandler.NotifyPosCallaback(update);
             m_input.registerUpdateCallback(m_updateCallback);
@@ -53,7 +63,8 @@ namespace SPMouse
         public void onRedraw(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            //g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            //g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
             //g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.AssumeLinear;
             int padding = 10;
             int minx = (int)Math.Min(cursorPos.X, pullPos.X) - padding;
@@ -67,17 +78,48 @@ namespace SPMouse
             //g.Clip = new Region(aabb);
             //g.FillRegion(Brushes.Black, g.Clip);
 
-            g.DrawBezier(Pens.Red, cursorPos, cursorPos, pullPos, pullPos);
+
+            /* Bezier length approximation https://stackoverflow.com/questions/29438398/cheap-way-of-calculating-cubic-bezier-length
+            ** Bezier bezier = Bezier (p0, p1, p2, p3);
+            ** chord = (p3-p0).Length;
+            ** cont_net = (p0 - p1).Length + (p2 - p1).Length + (p3 - p2).Length;
+            ** app_arc_length = (cont_net + chord) / 2
+            ** --> rope   = spanning quad / 2
+            ** --> rope*2 = spanning quad
+            **
+            ** Inverse problem: find controll points for given length:
+            ** our spanning quad is a rectangle, we know the width = dist, we seek the height:
+            ** --> spanning rectangle = (2*width + 2*height)
+            ** --> rope*2 = spanning rectangle
+            ** --> rope*2 = (2*dist + 2*height)
+            ** --> (rope*2 - dist*2) /2 = height
+            ** --> rope - dist = height
+            */
+
+            float diff = Vector2.Distance(VectorUtil.toVec(cursorPos), VectorUtil.toVec(pullPos));
+            int hangtrough = (int)(Math.Max(0.0, SPMouse.settings.sRopeLength - diff) * 0.666); //empiric factor that makes it work
+
+            //g.DrawBezier(penRopeA, cursorPos.X, cursorPos.Y,
+            //                        cursorPos.X, cursorPos.Y + hangtrough,
+            //                        pullPos.X, pullPos.Y + hangtrough,
+            //                        pullPos.X, pullPos.Y
+            //            );
+            g.DrawBezier(penRope, cursorPos.X, cursorPos.Y,
+                                    cursorPos.X, cursorPos.Y + hangtrough,
+                                    pullPos.X, pullPos.Y + hangtrough,
+                                    pullPos.X, pullPos.Y
+                        );
+
         }
 
-        //Hide the form from Alt+Tab by making it a "Tool Window"
+        //Manged way to use "SetWindowLong" without native call!
         protected override CreateParams CreateParams
         {
             get
             {
                 CreateParams cp = base.CreateParams;
                 // turn on WS_EX_TOOLWINDOW style bit
-                cp.ExStyle |= 0x80000 | 0x20 | 0x80 | 0x00000008;
+                cp.ExStyle |= Win32Util.WS_EX_LAYERED | Win32Util.WS_EX_TRANSPARENT | Win32Util.WS_EX_TOOLWINDOW | 0x00000008;
                 return cp;
             }
         }
@@ -86,11 +128,6 @@ namespace SPMouse
         {
             this.SuspendLayout();
             this.ResumeLayout(false);
-
-        }
-
-        private void SPMouseOverlay_Load(object sender, EventArgs e)
-        {
 
         }
     }

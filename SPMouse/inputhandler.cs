@@ -103,7 +103,7 @@ namespace SPMouse
                     moves = true;
                 }
 
-                ropeLogic.update(RopeLogic.toVec(m_pos));
+                ropeLogic.update(VectorUtil.toVec(m_pos));
                 callCallbacks(ropeLogic.cursorPoint, ropeLogic.pullPoint);
 
                 //painting happened, we need to intercept

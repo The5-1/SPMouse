@@ -6,6 +6,16 @@ namespace SPMouse
 {
     public class SPMouse : System.Windows.Forms.Form
     {
+        public struct Settings
+        {
+            public float sRopeLength;
+            public Color sDarkgray;
+            public Color sLightgray;
+            public Color sAccent;
+        }
+
+        public static SPMouse.Settings settings;
+
         private bool m_running;
 
         private PopupUtil m_popup;
@@ -34,13 +44,21 @@ namespace SPMouse
             App.DrawOnScreenTest();
 #endif 
 
+            SPMouse.Settings settings = new SPMouse.Settings();
+            settings.sRopeLength = 128;
+            settings.sDarkgray = Color.FromArgb(255, 32, 32, 32);
+            settings.sLightgray = Color.FromArgb(255, 128, 128, 128);
+            settings.sLightgray = Color.FromArgb(255, 128, 128, 128);
+            settings.sAccent = Win32Util.GetThemeColor();
+
             Application.EnableVisualStyles(); //Enable Win10 Styling
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new SPMouse());
+            Application.Run(new SPMouse(settings));
         }
 
-        public SPMouse()
+        public SPMouse(SPMouse.Settings settings)
         {
+            SPMouse.settings = settings;
             //Loads Resources from the Project Properties!
             SPMouse.icon = Properties.Resources.SPM_Icon;
 
