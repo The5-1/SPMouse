@@ -27,6 +27,15 @@ public static partial class Win32Util
         WM_MOUSEWHEEL = 0x020A
     }
 
+    //use SendInput, but only if LLMHF_INJECTED: https://stackoverflow.com/questions/21928956/how-do-i-modify-keys-in-a-keyboardproc-hooking-procedure
+    //https://docs.microsoft.com/en-us/windows/desktop/api/winuser/ns-winuser-tagmsllhookstruct
+    public enum LLHookFLags
+    {
+        LLMHF_INJECTED = 0x00000001,
+        LLMHF_LOWER_IL_INJECTED = 0x00000002
+    }
+
+
     //Signature for the event callback: https://msdn.microsoft.com/en-us/library/ms644986(v=VS.85).aspx
     //nCode: 0 means HC_ACTION, so something happened, <0 would mean "ignore and pass to next hook"
     //wParam: is the MouseMessage type enum
@@ -98,8 +107,15 @@ public static partial class Win32Util
     [StructLayout(LayoutKind.Sequential)]
     public struct INPUT
     {
-        public uint Type;
+        public INPUT_TYPE Type;
         public MOUSEKEYBDHARDWAREINPUT Data;
+    }
+
+    public enum INPUT_TYPE : uint
+    {
+        INPUT_MOUSE = 0,
+        INPUT_KEYBOARD = 1,
+        INPUT_HARDWARE = 2
     }
 
     //https://docs.microsoft.com/en-us/windows/desktop/api/winuser/ns-winuser-tagmouseinput

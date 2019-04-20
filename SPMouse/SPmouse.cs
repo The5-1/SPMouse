@@ -82,7 +82,7 @@ namespace SPMouse
             //tray.BalloonTipClosed += (sender, e) => { var thisIcon = (NotifyIcon)sender; thisIcon.Visible = false; thisIcon.Dispose(); };
             tray.Icon = icon;
             m_popup = new PopupUtil(tray);
-            m_popup.addSate("ToTray", "SPMouse is waiting in the system tray.");
+            m_popup.addSate("ToTray", "SPMouse is running in the system tray.");
             tray.BalloonTipIcon = ToolTipIcon.Info;
             tray.BalloonTipTitle = "Surgical Precision Mouse";
             tray.BalloonTipText = "Woah... such precision.\nMuch mousing, so surgical.";
