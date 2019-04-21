@@ -51,7 +51,9 @@ unsafe
 }
 ```
 
-All results Google brought up "confirmed" this. As in, nobody who asked found an answer how to  modify the `MSLLHOOKSTRUCT` before passing it along to `CallNextHookEx`.
+All results Google brought up "confirmed" this.  
+As in, nobody who asked found an answer how to modify the `MSLLHOOKSTRUCT` before passing it along to `CallNextHookEx`.  
+The modification itself seems to work, the object on the native side did change, but the other receivers in the event chain still get the original value.
 
 ## Drop it
 
