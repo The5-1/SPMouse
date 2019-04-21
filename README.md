@@ -7,7 +7,7 @@ Intercept low level input events and re-position cursor before any input registe
 
 ## Get the event
 
-For this use PInvoke to call the native Win32 API, e.g:
+For this use PInvoke to call the native Win32 API, e.g:  
 http://www.pinvoke.net/default.aspx/user32/SetWindowsHookEx.html
 
 ```CSharp
@@ -79,18 +79,17 @@ Emitting an actual event via `mouse_event()`or `SendInput()` and thus potentiall
 (If it happens, **restart** the PC. `taskkill /F` and even shutdown didn't help.)  
 
 ```CSharp
-if (/*condition*/)
+if (/*your logics conditions*/)
 {
     Win32Util.mouse_event((uint)Win32Util.MouseEventFlags.LEFTDOWN, ropeLogic.cursorPoint.X, ropeLogic.cursorPoint.Y, 0, 0);
     return (IntPtr)1; //drop the event
 }
 ```
-## Check if the event is not your own
+## Check if the event is your own and do not process it
 
 You can check a flag inside `MSLLHOOKSTRUCT` if its a "injected" event.  
 https://stackoverflow.com/questions/21928956/how-do-i-modify-keys-in-a-keyboardproc-hooking-procedure  
 
-This did not help in my case, though it should...
 
 ```CSharp
 if(hookStruct.flags == (uint)Win32Util.LLHookFLags.LLMHF_INJECTED || hookStruct.flags == (uint)Win32Util.LLHookFLags.LLMHF_LOWER_IL_INJECTED)
@@ -99,5 +98,5 @@ if(hookStruct.flags == (uint)Win32Util.LLHookFLags.LLMHF_INJECTED || hookStruct.
 }
 ```
 
-
+This did not help in my case, though it should in theory...
 
