@@ -96,6 +96,13 @@ namespace SPMouse
                 newState = previousState;
 
                 Win32Util.MSLLHOOKSTRUCT hookStruct = (Win32Util.MSLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(Win32Util.MSLLHOOKSTRUCT));
+
+
+                if(hookStruct.flags == (uint)Win32Util.LLHookFLags.LLMHF_INJECTED || hookStruct.flags == (uint)Win32Util.LLHookFLags.LLMHF_LOWER_IL_INJECTED)
+                {
+                    return Win32Util.CallNextHookEx(m_nativeHookPtr, nCode, wParam, lParam);
+                }
+
                 if ((Win32Util.MouseMessages)wParam == Win32Util.MouseMessages.WM_LBUTTONDOWN){
                     newState.LMB = true;                   
                 }
@@ -123,7 +130,9 @@ namespace SPMouse
                 }
 
 
-                bool moves;
+                bool moves = false;
+                m_delta.X = 0;
+                m_delta.Y = 0;
                 if ((Win32Util.MouseMessages)wParam == Win32Util.MouseMessages.WM_MOUSEMOVE)
                 {
                     newState.pos.X = hookStruct.pt.x;
@@ -132,12 +141,6 @@ namespace SPMouse
                     m_delta.Y = newState.pos.Y - previousState.pos.Y;
                     //Console.WriteLine("delta: x{0} y{1}", m_pos_delta.X, m_pos_delta.Y);
                     moves = true;
-                }
-                else
-                {
-                    m_delta.X = 0;
-                    m_delta.Y = 0;
-                    moves = false;
                 }
 
                 //painting happened, we need to intercept
@@ -148,6 +151,13 @@ namespace SPMouse
                     callCallbacks(ropeLogic.cursorPoint, ropeLogic.pullPoint, true);
 
                     Win32Util.SetCursorPos(ropeLogic.cursorPoint.X, ropeLogic.cursorPoint.Y);
+
+                    /*
+                     * infinite loop of sending, recievieng this, and re-emmiting a new one!!!
+                    **
+                    ** Win32Util.mouse_event((uint)Win32Util.MouseEventFlags.LEFTDOWN, ropeLogic.cursorPoint.X, ropeLogic.cursorPoint.Y, 0, 0);
+                    */
+
                     newState.pos = ropeLogic.cursorPoint;
 
                     //Console.WriteLine("intercepting: x{0} y{1}", ropeLogic.cursorPoint.X, ropeLogic.cursorPoint.Y);
@@ -157,6 +167,7 @@ namespace SPMouse
                 }
                 else 
                 {
+                    //Console.WriteLine("no draw " + DateTime.Now.ToLongTimeString());
                     //Console.WriteLine("x{0} y{1} {2} {3}", m_pos.X, m_pos.Y, m_LMB_held ? "L" : " ", m_RMB_held ? "R" : " ");
 
                     ropeLogic.reset(VectorUtil.toVec(newState.pos));
@@ -194,7 +205,7 @@ namespace SPMouse
                 //}
             }
 
-
+            Console.WriteLine("pass trough");
             return Win32Util.CallNextHookEx(m_nativeHookPtr, nCode, wParam, lParam);
         }
 

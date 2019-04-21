@@ -27,12 +27,12 @@ namespace SPMouse
         {
             cursorPos = mouseIn;
             pullPos = mouseIn;
-            Console.WriteLine("reset: x{0} y{1}", mouseIn.X, mouseIn.Y);
+            //Console.WriteLine("reset: x{0} y{1}", mouseIn.X, mouseIn.Y);
         }
 
         public void update(Vector2 mouseIn, Vector2 mouseDelta)
         {
-            Console.WriteLine("delta: x{0} y{1}", mouseDelta.X, mouseDelta.Y);
+            //Console.WriteLine("delta: x{0} y{1}", mouseDelta.X, mouseDelta.Y);
 
             pullPos += mouseDelta;
             ropeDelta = pullPos - cursorPos;
