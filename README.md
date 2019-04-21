@@ -79,9 +79,11 @@ Emitting an actual event via `mouse_event()`or `SendInput()` and thus potentiall
 (If it happens, **restart** the PC. `taskkill /F` and even shutdown didn't help.)  
 
 ```CSharp
-if (/*your logics conditions*/)
+if (/*your conditions, e.g. on LMB_DOWN*/)
 {
+    //emit a new event, SendInput() is the modern alternative
     Win32Util.mouse_event((uint)Win32Util.MouseEventFlags.LEFTDOWN, ropeLogic.cursorPoint.X, ropeLogic.cursorPoint.Y, 0, 0);
+
     return (IntPtr)1; //drop the event
 }
 ```
@@ -92,6 +94,7 @@ https://stackoverflow.com/questions/21928956/how-do-i-modify-keys-in-a-keyboardp
 
 
 ```CSharp
+//Check the flag if it's an injected event already
 if(hookStruct.flags == (uint)Win32Util.LLHookFLags.LLMHF_INJECTED || hookStruct.flags == (uint)Win32Util.LLHookFLags.LLMHF_LOWER_IL_INJECTED)
 {
     return Win32Util.CallNextHookEx(m_nativeHookPtr, nCode, wParam, lParam);
